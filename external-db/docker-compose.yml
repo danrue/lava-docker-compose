@@ -25,25 +25,3 @@ services:
     - "MASTER_URL=tcp://server:5556" # url of lava master
 
 #drue@nuc:~/lava$ docker-compose exec server lava-server manage users add --staff --superuser --email dan.rue@linaro.org --passwd foo drue
-
-
-#(403) CSRF verification failed. Request aborted.
-
-
-
-#DISPATCHER_HOSTNAME=--hostname=calvin-2018.7-88
-
-### DISPATCHER
-#/usr/bin/lava-slave --level $LOGLEVEL --log-file $LOGFILE --master $MASTER_URL --socket-addr $LOGGER_URL $IPV6 $ENCRYPT $MASTER_CERT $SLAVE_CERT $DISPATCHER_HOSTNAME
-#$ docker run -e "DISPATCHER_HOSTNAME=--hostname=calvin-2018.7-88" -e "LOGGER_URL=tcp://calvin:5555" -e "MASTER_URL=tcp://calvin:5556"  --name calvin-docker-88-4  hub.lavasoftware.org/lava/lava/lava-dispatcher/master:2018.7-88-ga7b7939dd
-
-### SERVER
-#$ docker run --net dockernet --ip 172.18.0.5 -it hub.lavasoftware.org/lava/lava/lava-server/master:2018.7-88-ga7b7939dd
-
-
-#docker run \
-#-e "DISPATCHER_HOSTNAME=--hostname=calvin-2018.7-88" \
-#-e "LOGGER_URL=tcp://calvin:5555" \
-#-e "MASTER_URL=tcp://calvin:5556" \
-#--name calvin-docker-88-3 \
-#hub.lavasoftware.org/lava/lava/lava-dispatcher/master:2018.7-88-ga7b7939dd
