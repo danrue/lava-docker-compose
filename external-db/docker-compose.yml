@@ -20,6 +20,7 @@ services:
       - database
   dispatcher:
     image: lavasoftware/amd64-lava-dispatcher:2018.11
+    privileged: true
     devices:
       - '/dev/kvm:/dev/kvm'
       - '/dev/net/tun:/dev/net/tun'
@@ -30,7 +31,6 @@ services:
     volumes:
       - '/boot:/boot:ro'
       - '/lib/modules:/lib/modules:ro'
-  
 
 volumes:
   pgdata:
