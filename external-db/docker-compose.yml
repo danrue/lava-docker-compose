@@ -5,9 +5,8 @@ services:
     environment:
       POSTGRES_USER: lavaserver
       POSTGRES_PASSWORD: mysecretpassword
-      PGDATA: /var/lib/postgresql/data/pgdata
     volumes:
-      - ${PWD}/pgdata:/var/lib/postgresql/data/pgdata
+      - pgdata:/var/lib/postgresql/data
   server:
     image: lavasoftware/amd64-lava-server:2018.11
     ports:
@@ -15,13 +14,24 @@ services:
     volumes:
       - ${PWD}/etc/lava-server/settings.conf:/etc/lava-server/settings.conf
       - ${PWD}/etc/lava-server/instance.conf:/etc/lava-server/instance.conf
+      - ${PWD}/etc/lava-server/dispatcher-config/health-checks:/etc/lava-server/dispatcher-config/health-checks
+      - ${PWD}/etc/lava-server/dispatcher-config/devices:/etc/lava-server/dispatcher-config/devices
     depends_on:
       - database
   dispatcher:
     image: lavasoftware/amd64-lava-dispatcher:2018.11
+    devices:
+      - '/dev/kvm:/dev/kvm'
+      - '/dev/net/tun:/dev/net/tun'
     environment:
-    - "DISPATCHER_HOSTNAME=--hostname=dispatcher.lava.therub.org"
-    - "LOGGER_URL=tcp://server:5555" # url to send logs
-    - "MASTER_URL=tcp://server:5556" # url of lava master
+      - "DISPATCHER_HOSTNAME=--hostname=dispatcher"
+      - "LOGGER_URL=tcp://server:5555" # url to send logs
+      - "MASTER_URL=tcp://server:5556" # url of lava master
+    volumes:
+      - '/boot:/boot:ro'
+      - '/lib/modules:/lib/modules:ro'
+  
 
+volumes:
+  pgdata:
 #drue@nuc:~/lava$ docker-compose exec server lava-server manage users add --staff --superuser --email dan.rue@linaro.org --passwd foo drue
