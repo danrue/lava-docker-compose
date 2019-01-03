@@ -40,6 +40,11 @@ services:
       - '/boot:/boot:ro'
       - '/lib/modules:/lib/modules:ro'
 
+  # Local health check image hosting
+  images:
+    image: nginx
+    volumes:
+      - ${PWD}/images:/usr/share/nginx/html:ro
+
 volumes:
   pgdata:
-#drue@nuc:~/lava$ docker-compose exec server lava-server manage users add --staff --superuser --email dan.rue@linaro.org --passwd foo drue
