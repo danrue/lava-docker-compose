@@ -152,6 +152,10 @@ start_lava_master
 echo "done"
 echo
 
+if [ -e /root/provision.sh ]; then
+    /root/provision.sh
+fi
+
 ################
 # Wait forever #
 ################

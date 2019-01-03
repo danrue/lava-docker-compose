@@ -19,10 +19,11 @@ services:
     ports:
       - 80:80
     volumes:
-      - ${PWD}/etc/lava-server/settings.conf:/etc/lava-server/settings.conf
-      - ${PWD}/etc/lava-server/instance.conf:/etc/lava-server/instance.conf
-      - ${PWD}/etc/lava-server/dispatcher-config/health-checks:/etc/lava-server/dispatcher-config/health-checks
-      - ${PWD}/etc/lava-server/dispatcher-config/devices:/etc/lava-server/dispatcher-config/devices
+      - ${PWD}/server/etc/lava-server/settings.conf:/etc/lava-server/settings.conf
+      - ${PWD}/server/etc/lava-server/instance.conf:/etc/lava-server/instance.conf
+      - ${PWD}/server/etc/lava-server/dispatcher-config/health-checks:/etc/lava-server/dispatcher-config/health-checks
+      - ${PWD}/server/etc/lava-server/dispatcher-config/devices:/etc/lava-server/dispatcher-config/devices
+      - ${PWD}/server/root/provision.sh:/root/provision.sh
     depends_on:
       - database
   dispatcher:
