@@ -2,6 +2,7 @@ version: '3.4'
 services:
   database:
     image: postgres:9.6
+    container_name: lava_postgres
     environment:
       POSTGRES_USER: lavaserver
       POSTGRES_PASSWORD: mysecretpassword
@@ -16,6 +17,7 @@ services:
     build:
       context: ./docker-server
 
+    container_name: lava_server
     ports:
       - 80:80
     volumes:
@@ -28,6 +30,7 @@ services:
       - database
   dispatcher:
     image: lavasoftware/amd64-lava-dispatcher:2018.11
+    container_name: lava_dispatcher
     privileged: true
     devices:
       - '/dev/kvm:/dev/kvm'
@@ -43,8 +46,9 @@ services:
   # Local health check image hosting
   images:
     image: nginx
+    container_name: lava_images
     volumes:
-      - ${PWD}/images:/usr/share/nginx/html:ro
+      - ./images:/usr/share/nginx/html:ro
 
 volumes:
   pgdata:
