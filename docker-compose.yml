@@ -15,33 +15,41 @@ services:
     # and will become unnecessary once amd64-lava-server is updated to include
     # https://git.lavasoftware.org/lava/pkg/docker/commit/98fe3deecbdddfc03e99fdb8a87c379acdd1a5a6
     build:
-      context: ./docker-server
+      context: ./server-docker
 
     container_name: lava_server
     ports:
       - 80:80
     volumes:
-      - ./server/etc/lava-server/settings.conf:/etc/lava-server/settings.conf
-      - ./server/etc/lava-server/instance.conf:/etc/lava-server/instance.conf
-      - ./server/etc/lava-server/dispatcher-config/health-checks:/etc/lava-server/dispatcher-config/health-checks
-      - ./server/etc/lava-server/dispatcher-config/devices:/etc/lava-server/dispatcher-config/devices
-      - ./server/root/provision.sh:/root/provision.sh
+      - ./server-overlay/etc/lava-server/settings.conf:/etc/lava-server/settings.conf
+      - ./server-overlay/etc/lava-server/instance.conf:/etc/lava-server/instance.conf
+      - ./server-overlay/etc/lava-server/dispatcher-config/health-checks:/etc/lava-server/dispatcher-config/health-checks
+      - ./server-overlay/etc/lava-server/dispatcher-config/devices:/etc/lava-server/dispatcher-config/devices
+      - ./server-overlay/root/provision.sh:/root/provision.sh
     depends_on:
       - database
+      - images
   dispatcher:
-    image: lavasoftware/amd64-lava-dispatcher:2018.11
+    #image: lavasoftware/amd64-lava-dispatcher:2018.11
+
+    build:
+      context: ./dispatcher-docker
+
     container_name: lava_dispatcher
-    privileged: true
+    #privileged: true
     devices:
-      - '/dev/kvm:/dev/kvm'
-      - '/dev/net/tun:/dev/net/tun'
+      - /dev/kvm
+      - /dev/net/tun
+      - /dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0001-if00-port0
     environment:
       - "DISPATCHER_HOSTNAME=--hostname=dispatcher"
       - "LOGGER_URL=tcp://server:5555" # url to send logs
       - "MASTER_URL=tcp://server:5556" # url of lava master
     volumes:
-      - '/boot:/boot:ro'
-      - '/lib/modules:/lib/modules:ro'
+      - ./dispatcher-overlay/opt:/opt
+      - ./dispatcher-overlay/etc/ser2net.conf:/etc/ser2net.conf
+      - /boot:/boot:ro
+      - /lib/modules:/lib/modules:ro
 
   # Local health check image hosting
   images:
