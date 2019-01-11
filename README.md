@@ -65,7 +65,7 @@ provided, as well as device and health-check directories.
 
 The lava dispatcher is run using the official container directly. However, to
 use an actual board container modifications would have to be made in a similar
-way as they were made to lava-server. See the lava.therub.org branch for an
+way as they were made to lava-server. See the beaglebone-black branch for an
 example implemention of a beaglebone-black.
 
 #### images
