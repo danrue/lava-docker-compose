@@ -1,7 +1,8 @@
 # Using LAVA with Docker Compose
 
 This repository attempts to provide a reference implementation of deploying
-LAVA using its officially distributed docker containers.
+LAVA using its [officially distributed docker
+containers](https://master.lavasoftware.org/static/docs/v2/docker-admin.html#official-lava-software-docker-images).
 
 ## Requirements
 
