@@ -50,7 +50,7 @@ actions:
     prompts:
     - 'root@jessie:'
     timeout:
-      minutes: 2
+      minutes: 10
 
 - test:
     timeout:
