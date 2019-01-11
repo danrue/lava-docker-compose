@@ -38,7 +38,7 @@ should become more simple.
 
 ### Containers
 
-There are 4 containers defined in `docker-compose.yaml`:
+There are 4 containers defined in [docker-compose.yaml](docker-compose.yaml):
 
 #### database
 
@@ -47,20 +47,23 @@ an official postgres container is a lot easier than using the postgres that
 comes with the lava-server container. This set-up makes data persistant by
 default, and makes backups easy (if desired).
 
-Note that `./server-overlay/etc/lava-server` provides connection details to
-this database for lava-server.
+Note that [./server-overlay/etc/lava-server](./server-overlay/etc/lava-server)
+provides connection details to this database for lava-server.
 
 #### server
 
 This is lava-server (lava master). In order to provision a qemu device
-automatically, a script at `./server-overlay/root/provision.sh` is run at boot
-time to add a superuser (admin/admin) and a qemu device and qemu worker. The
-lava-server container's `entrypoint.sh` needed to be modified to support this
-functionality - a feature that could be added upstream (see discussion at
+automatically, a script at
+[./server-overlay/root/provision.sh](./server-overlay/root/provision.sh) is run
+at boot time to add a superuser (admin/admin) and a qemu device and qemu
+worker. The lava-server container's
+[entrypoint.sh](server-docker/entrypoint.sh) needed to be modified to support
+this functionality - a feature that could be added upstream (see discussion at
 https://git.lavasoftware.org/lava/pkg/docker/merge_requests/10 for details).
 
-Several other files are mounted into the container. `settings.conf` is
-provided, as well as device and health-check directories.
+Several other files are mounted into the container.
+[settings.conf](server-overlay/etc/lava-server/settings.conf) is provided, as
+well as device and health-check directories.
 
 #### dispatcher
 
@@ -72,8 +75,8 @@ example implemention of a beaglebone-black.
 #### images
 
 This is an nginx container that serves the `./images` directory. It is used to
-cache the image files necessary for health checks. The `Makefile` has a rule to
-fetch these files initially.
+cache the image files necessary for health checks. The [Makefile](Makefile) has
+a rule to create the directory and fetch these files.
 
 ## Troubleshooting
 
