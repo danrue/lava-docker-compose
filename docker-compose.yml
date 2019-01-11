@@ -31,10 +31,11 @@ services:
   dispatcher:
     image: lavasoftware/amd64-lava-dispatcher:2018.11
     container_name: lava_dispatcher
-    privileged: true
     devices:
-      - '/dev/kvm:/dev/kvm'
-      - '/dev/net/tun:/dev/net/tun'
+      - /dev/kvm
+      - /dev/net/tun
+    cap_add:
+      - NET_ADMIN
     environment:
       - "DISPATCHER_HOSTNAME=--hostname=dispatcher"
       - "LOGGER_URL=tcp://server:5555" # url to send logs
