@@ -15,17 +15,17 @@ services:
     # and will become unnecessary once amd64-lava-server is updated to include
     # https://git.lavasoftware.org/lava/pkg/docker/commit/98fe3deecbdddfc03e99fdb8a87c379acdd1a5a6
     build:
-      context: ./docker-server
+      context: ./server-docker
 
     container_name: lava_server
     ports:
       - 80:80
     volumes:
-      - ./server/etc/lava-server/settings.conf:/etc/lava-server/settings.conf
-      - ./server/etc/lava-server/instance.conf:/etc/lava-server/instance.conf
-      - ./server/etc/lava-server/dispatcher-config/health-checks:/etc/lava-server/dispatcher-config/health-checks
-      - ./server/etc/lava-server/dispatcher-config/devices:/etc/lava-server/dispatcher-config/devices
-      - ./server/root/provision.sh:/root/provision.sh
+      - ./server-overlay/etc/lava-server/settings.conf:/etc/lava-server/settings.conf
+      - ./server-overlay/etc/lava-server/instance.conf:/etc/lava-server/instance.conf
+      - ./server-overlay/etc/lava-server/dispatcher-config/health-checks:/etc/lava-server/dispatcher-config/health-checks
+      - ./server-overlay/etc/lava-server/dispatcher-config/devices:/etc/lava-server/dispatcher-config/devices
+      - ./server-overlay/root/provision.sh:/root/provision.sh
     depends_on:
       - database
   dispatcher:

@@ -11,6 +11,7 @@ Install the following.
 
 ## Configuration
 
+No configuration should be necessary when running a simple qemu worker.
 
 ## Usage
 
@@ -21,10 +22,7 @@ device. Its health check should run automatically.
 
 `make clean`: Permanently delete the containers and the pgsql volume.
 
-Once up, go to your http://your-IP (port 80) and log in with admin:admin.
+Once up, go to your http://localhost (port 80) and log in with admin:admin.
 
 ## Troubleshooting
 
-### Filesystem permission problems with volume mounts
-- On fedora, running docker 1.13.1 installed from dnf, received permission
-  denied for mounted files. Moving to upstream docker fixed the issue.
