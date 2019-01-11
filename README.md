@@ -1,4 +1,4 @@
-# Using LAVA with Docker
+# Using LAVA with Docker Compose
 
 This repository attempts to provide a reference implementation of deploying
 LAVA using its officially distributed docker containers.
