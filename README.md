@@ -38,7 +38,7 @@ should become more simple.
 
 ### Containers
 
-There are 4 containers defined in [docker-compose.yaml](docker-compose.yaml):
+There are 4 containers defined in [docker-compose.yml](docker-compose.yml):
 
 #### database
 
@@ -47,7 +47,8 @@ an official postgres container is a lot easier than using the postgres that
 comes with the lava-server container. This set-up makes data persistant by
 default, and makes backups easy (if desired).
 
-Note that [./server-overlay/etc/lava-server](./server-overlay/etc/lava-server)
+Note that
+[./server-overlay/etc/lava-server/instance.conf](./server-overlay/etc/lava-server/instance.conf)
 provides connection details to this database for lava-server.
 
 #### server
@@ -59,7 +60,9 @@ at boot time to add a superuser (admin/admin) and a qemu device and qemu
 worker. The lava-server container's
 [entrypoint.sh](server-docker/entrypoint.sh) needed to be modified to support
 this functionality - a feature that could be added upstream (see discussion at
-https://git.lavasoftware.org/lava/pkg/docker/merge_requests/10 for details).
+[pkg/docker
+MR#10](https://git.lavasoftware.org/lava/pkg/docker/merge_requests/10) for
+details).
 
 Several other files are mounted into the container.
 [settings.conf](server-overlay/etc/lava-server/settings.conf) is provided, as
