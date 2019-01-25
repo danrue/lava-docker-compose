@@ -1,5 +1,6 @@
 version: '3.4'
 services:
+
   database:
     image: postgres:9.6
     container_name: lava_postgres
@@ -8,12 +9,20 @@ services:
       POSTGRES_PASSWORD: mysecretpassword
     volumes:
       - pgdata:/var/lib/postgresql/data
+
+  squid:
+    image: datadog/squid
+    container_name: lava_squid
+    volumes:
+      - squid:/var/spool/squid
+      - ./squid/squid.conf:/etc/squid/squid.conf
+    ports:
+      - 3128:3128
+
   server:
     #image: lavasoftware/amd64-lava-server:2018.11
-
-    # Use an updated entrypoint; this is necessary to fix a timing issue on first run,
-    # and will become unnecessary once amd64-lava-server is updated to include
-    # https://git.lavasoftware.org/lava/pkg/docker/commit/98fe3deecbdddfc03e99fdb8a87c379acdd1a5a6
+    # Use an updated entrypoint; this is necessary to run provision.sh at boot time
+    # See https://git.lavasoftware.org/lava/pkg/docker/merge_requests/10
     build:
       context: ./server-docker
 
@@ -25,9 +34,11 @@ services:
       - ./server-overlay/etc/lava-server/instance.conf:/etc/lava-server/instance.conf
       - ./server-overlay/etc/lava-server/dispatcher-config/health-checks:/etc/lava-server/dispatcher-config/health-checks
       - ./server-overlay/etc/lava-server/dispatcher-config/devices:/etc/lava-server/dispatcher-config/devices
+      - ./server-overlay/etc/lava-server/env.yaml:/etc/lava-server/env.yaml
       - ./server-overlay/root/provision.sh:/root/provision.sh
     depends_on:
       - database
+
   dispatcher:
     image: lavasoftware/amd64-lava-dispatcher:2018.11
     container_name: lava_dispatcher
@@ -44,13 +55,8 @@ services:
       - '/boot:/boot:ro'
       - '/lib/modules:/lib/modules:ro'
 
-  # Local health check image hosting
-  images:
-    image: nginx
-    container_name: lava_images
-    volumes:
-      - ./images:/usr/share/nginx/html:ro
-
 volumes:
   pgdata:
     name: lava-server-pgdata
+  squid:
+    name: lava-squid-cache

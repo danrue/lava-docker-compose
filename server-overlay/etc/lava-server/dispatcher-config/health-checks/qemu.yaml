@@ -26,7 +26,7 @@ actions:
     images:
         rootfs:
           image_arg: -drive format=raw,file={rootfs}
-          url: http://images/kvm/standard/large-stable-6.img.gz
+          url: http://images.validation.linaro.org/kvm/standard/large-stable-6.img.gz
           compression: gz
     os: debian
     root_partition: 1

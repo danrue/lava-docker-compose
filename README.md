@@ -51,6 +51,13 @@ Note that
 [./server-overlay/etc/lava-server/instance.conf](./server-overlay/etc/lava-server/instance.conf)
 provides connection details to this database for lava-server.
 
+#### squid
+
+This is a squid container that serves as an http proxy to the LAVA dispatcher.
+Its purpose is to cache downloads to a docker volume, to improve performance
+and prevent duplicate downloads. This is enabled in
+[./server-overlay/etc/lava-server/env.yaml](./server-overlay/etc/lava-server/env.yaml)
+
 #### server
 
 This is lava-server (lava master). In order to provision a qemu device
@@ -74,12 +81,4 @@ The lava dispatcher is run using the official container directly. However, to
 use an actual board container modifications would have to be made in a similar
 way as they were made to lava-server. See the beaglebone-black branch for an
 example implemention of a beaglebone-black.
-
-#### images
-
-This is an nginx container that serves the `./images` directory. It is used to
-cache the image files necessary for health checks. The [Makefile](Makefile) has
-a rule to create the directory and fetch these files.
-
-## Troubleshooting
 
