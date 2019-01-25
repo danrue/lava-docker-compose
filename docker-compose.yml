@@ -32,29 +32,21 @@ services:
       - database
       - images
   dispatcher:
-    #image: lavasoftware/amd64-lava-dispatcher:2018.11
-
-    build:
-      context: ./dispatcher-docker
-
+    image: lavasoftware/amd64-lava-dispatcher:2018.11
     container_name: lava_dispatcher
     devices:
       - /dev/kvm
       - /dev/net/tun
-      - /dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0001-if00-port0
     cap_add:
       - NET_ADMIN
-#      - SYS_ADMIN
     environment:
       - "DISPATCHER_HOSTNAME=--hostname=dispatcher"
       - "LOGGER_URL=tcp://server:5555" # url to send logs
       - "MASTER_URL=tcp://server:5556" # url of lava master
     volumes:
       - ./dispatcher-overlay/opt:/opt
-      - ./dispatcher-overlay/etc/ser2net.conf:/etc/ser2net.conf
       - /boot:/boot:ro
       - /lib/modules:/lib/modules:ro
-#      - dispatcher-nfs-exports:/var/lib/lava/dispatcher/tmp
       - /var/lib/lava/dispatcher/tmp:/var/lib/lava/dispatcher/tmp # NFS
       - /srv/tftp:/srv/tftp # tftp
       - ./dispatcher-overlay/etc/lava-dispatcher:/etc/lava-dispatcher
@@ -66,8 +58,15 @@ services:
     volumes:
       - ./images:/usr/share/nginx/html:ro
 
+  ser2net:
+    image: danrue/ser2net:3.5
+    container_name: lava_ser2net
+    volumes:
+      - ./ser2net/ser2net.conf:/etc/ser2net.conf
+    devices:
+      - /dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0001-if00-port0
+
+
 volumes:
   pgdata:
     name: lava-server-pgdata
-#  dispatcher-nfs-exports:
-#    name: dispatcher-nfs-exports
