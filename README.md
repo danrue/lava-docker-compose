@@ -23,10 +23,33 @@ device. Its health check should run automatically.
 
 Once up, go to your http://your-IP (port 80) and log in with admin:admin.
 
+## Upgrades
 
-apt-get install nfs-kernel-server tftpd-hpa
-sudo mkdir /etc/exports.d
-cp lava-dispatcher-nfs.exports into /etc/exports.d/
-sudo mkdir -p /var/lib/lava/dispatcher/tmp
+1. Stop containers.
+2. Back up pgsql from its docker volume
 
-edit /usr/lib/python3/dist-packages/lava_dispatcher/actions/boot/__init__.py and set self.interrupt_newline = False
+    sudo tar cvzf lava-server-pgdata-$(date +%Y%m%d).tgz /var/lib/docker/volumes/lava-server-pgdata
+
+3. Change e.g. `lavasoftware/amd64-lava-server:2018.11` to
+`lavasoftware/amd64-lava-server:2019.01` and
+`lavasoftware/amd64-lava-dispatcher:2018.11` to
+`lavasoftware/amd64-lava-dispatcher:2019.01` in docker-compose.yml.
+
+## Useful Commands
+
+Spy on the serial port:
+
+    docker-compose exec dispatcher telnet ser2net 5001
+
+## Misc Notes
+
+Dealing with NFS/tftp
+
+    apt-get install nfs-kernel-server tftpd-hpa
+    sudo mkdir /etc/exports.d
+    cp lava-dispatcher-nfs.exports into /etc/exports.d/
+    sudo mkdir -p /var/lib/lava/dispatcher/tmp
+
+    edit /usr/lib/python3/dist-packages/lava_dispatcher/actions/boot/__init__.py and set self.interrupt_newline = False
+
+
