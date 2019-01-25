@@ -34,6 +34,10 @@ Once up, go to your http://your-IP (port 80) and log in with admin:admin.
 `lavasoftware/amd64-lava-server:2019.01` and
 `lavasoftware/amd64-lava-dispatcher:2018.11` to
 `lavasoftware/amd64-lava-dispatcher:2019.01` in docker-compose.yml.
+4. Change the FROM line if any containers are being rebuilt, such as
+[./server-docker/Dockerfile](./server-docker/Dockerfile)
+5. Start containers.
+
 
 ## Useful Commands
 
