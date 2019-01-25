@@ -20,7 +20,7 @@ services:
       - 3128:3128
 
   server:
-    #image: lavasoftware/amd64-lava-server:2018.11
+    #image: lavasoftware/amd64-lava-server:2019.01
     # Use an updated entrypoint; this is necessary to run provision.sh at boot time
     # See https://git.lavasoftware.org/lava/pkg/docker/merge_requests/10
     build:
@@ -40,7 +40,7 @@ services:
       - database
 
   dispatcher:
-    image: lavasoftware/amd64-lava-dispatcher:2018.11
+    image: lavasoftware/amd64-lava-dispatcher:2019.01
     container_name: lava_dispatcher
     devices:
       - /dev/kvm

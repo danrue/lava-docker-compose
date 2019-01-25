@@ -26,6 +26,22 @@ device. Its health check should run automatically.
 Once up, go to your http://localhost (port 80) and log in with admin:admin. You
 should see qemu-01's health-check running and it should finish successfully.
 
+## Upgrades
+
+1. Stop containers.
+2. Back up pgsql from its docker volume
+
+    sudo tar cvzf lava-server-pgdata-$(date +%Y%m%d).tgz /var/lib/docker/volumes/lava-server-pgdata
+
+3. Change e.g. `lavasoftware/amd64-lava-server:2018.11` to
+`lavasoftware/amd64-lava-server:2019.01` and
+`lavasoftware/amd64-lava-dispatcher:2018.11` to
+`lavasoftware/amd64-lava-dispatcher:2019.01` in docker-compose.yml.
+4. Change the FROM line if any containers are being rebuilt, such as
+[./server-docker/Dockerfile](./server-docker/Dockerfile)
+5. Start containers.
+
+
 ## Design
 
 The design goal of this repository is to demonstrate how to use the official
