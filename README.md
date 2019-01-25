@@ -23,8 +23,10 @@ device. Its health check should run automatically.
 
 Once up, go to your http://your-IP (port 80) and log in with admin:admin.
 
-## Troubleshooting
 
-### Filesystem permission problems with volume mounts
-- On fedora, running docker 1.13.1 installed from dnf, received permission
-  denied for mounted files. Moving to upstream docker fixed the issue.
+apt-get install nfs-kernel-server tftpd-hpa
+sudo mkdir /etc/exports.d
+cp lava-dispatcher-nfs.exports into /etc/exports.d/
+sudo mkdir -p /var/lib/lava/dispatcher/tmp
+
+edit /usr/lib/python3/dist-packages/lava_dispatcher/actions/boot/__init__.py and set self.interrupt_newline = False

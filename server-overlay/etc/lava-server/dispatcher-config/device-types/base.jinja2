@@ -1,0 +1,335 @@
+{# Base Kernel options #}
+{% set base_kernel_args = '' %}
+{% set base_extra_nfsroot_args = extra_nfsroot_args | default('') %}
+
+{% set base_nfsroot_args = ("nfsroot={NFS_SERVER_IP}:{NFSROOTFS},tcp,hard,intr" + base_extra_nfsroot_args) -%}
+{% set base_nbdroot_args = ("nbd.server={NBDSERVERIP} nbd.port={NBDSERVERPORT} root=/dev/ram0 ramdisk_size=16384 rootdelay=7 ") -%}
+
+{% if static_ip and static_gateway and static_netmask and static_dns %}
+{% set base_ip_args = base_ip_args|default("ip=" + static_ip + "::" + static_gateway + ":" + static_netmask + ":::off:" + static_dns + ":") %}
+{% else %}
+{% set base_ip_args = base_ip_args|default("ip=dhcp") %}
+{% endif %}
+
+{# these options are used by both ssh and scp! #}
+{# check the manpages *carefully* & ensure compatibility! #}
+{# Do not specify port or login (-p/-P or -l) here as this is now handled in the codebase. #}
+{% set ssh_options = (
+"          - '-o'
+          - 'Compression=yes'
+          - '-o'
+          - 'PasswordAuthentication=no'
+          - '-o'
+          - 'LogLevel=FATAL'
+"
+) -%}
+
+{% set ssh_user = 'root' -%}
+
+{# The code will create the correct port arguments for SCP and SSH, as they are different #}
+{% set ssh_port = ssh_port|default('22') -%}
+
+{# This is no longer a requirement, to support devices that allow login without authentication #}
+{% set ssh_identity_file = ssh_identity_file|default('dynamic_vm_keys/lava') -%}
+
+{% set schroot_options = (
+"          - 'schroot'
+          - '-d'
+          - '/'
+          - '-u'
+          - 'root'"
+) -%}
+
+{# UEFI menu support #}
+{% set base_menu_interrupt_prompt = 'The default boot selection will start in' -%}
+{% set base_menu_interrupt_string = ' ' -%}
+{% set base_item_markup_list = (
+'            - "["
+            - "]"'
+) -%}
+{% set base_item_class = '0-9' -%}
+{% set base_item_separator = ' ' -%}
+{% set base_label_class = 'a-zA-Z0-9\\s\\:' -%}
+{% set base_menu_bootloader_prompt = 'Start:' -%}
+{% set base_menu_boot_message = "Loaded: LinuxImage" -%}
+{% set base_menu_dictionary = {} -%}
+
+{% block character_delays %}
+{% if boot_character_delay or test_character_delay %}
+# in milliseconds
+character_delays:
+{% if boot_character_delay %}
+      boot: {{ boot_character_delay }}
+{% endif -%}
+{% if test_character_delay %}
+      test: {{ test_character_delay }}
+{% endif -%}
+{% endif -%}
+{% endblock character_delays -%}
+
+{% block constants %}
+constants:
+
+  # POSIX os (not AOSP)
+  posix:
+    lava_test_sh_cmd: {{ lava_test_sh_cmd | default('/bin/sh') }}
+    lava_test_results_dir: {{ lava_test_results_dir | default('/lava-%s') }}
+    lava_test_shell_file: {{ lava_test_shell_file | default('~/.bashrc') }}
+
+  # bootloader specific
+  u-boot:
+    interrupt-prompt: '{{ uboot_autoboot_prompt | default("Hit any key to stop autoboot") }}'
+    interrupt-character: '{{ uboot_interrupt_character | default(" ") }}'
+    interrupt_ctrl_list: {{ interrupt_ctrl_list  | default([]) }}
+    interrupt-newline: {{ uboot_interrupt_newline | default(True) }}
+    final-message: '{{ uboot_final_message | default("Starting kernel") }}'
+    error-messages:
+      - 'Resetting CPU'
+      - 'Must RESET board to recover'
+      - 'TIMEOUT'
+      - 'Retry count exceeded'
+      - 'ERROR: The remote end did not respond in time.'
+{% if uboot_extra_error_message %}
+      - '{{ uboot_extra_error_message }}'
+{% endif %}
+  grub:
+    interrupt-prompt: '{{ grub_autoboot_prompt | default("for a command-line") }}'
+    interrupt-character: '{{ grub_interrupt_character | default ("c") }}'
+    interrupt-newline: {{ grub_interrupt_newline | default(False) }}
+    error-messages:
+      - "error: missing (.*) symbol."
+  grub-efi:
+    interrupt-prompt: '{{ grub_autoboot_prompt | default("for a command-line") }}'
+    interrupt-character: '{{ grub_interrupt_character | default ("c") }}'
+    error-messages:
+      - 'Undefined OpCode Exception PC at'
+      - 'Synchronous Exception at'
+      - "error: missing (.*) symbol."
+  ipxe:
+    interrupt-prompt: '{{ ipxe_autoboot_prompt  | default("Press Ctrl-B for the iPXE command line") }}'
+    interrupt_ctrl_list: {{ ipxe_interrupt_ctrl_list  | default(['b']) }}
+    error-messages:
+      - 'No configuration methods succeeded'
+      - 'Connection timed out'
+
+  # OS shutdown message
+  # Override: set as the shutdown-message parameter of an Action.
+  # SHUTDOWN_MESSAGE
+  shutdown-message: '{{ shutdown_message | default("The system is going down for reboot NOW") }}'
+
+  # Kernel starting message
+  kernel-start-message: '{{ kernel_start_message | default('Linux version [0-9]') }}'
+
+  # Default shell prompt for AutoLogin
+  # DEFAULT_SHELL_PROMPT
+  default-shell-prompt: '{{ default_shell_prompt | default("lava-test: # ") }}'
+
+  # pexpect.spawn maxread
+  # SPAWN_MAXREAD - in bytes, quoted as a string
+  # 1 to turn off buffering, pexpect default is 2000
+  # maximum may be limited by platform issues to 4092
+  # avoid setting searchwindowsize:
+  # Data before searchwindowsize point is preserved, but not searched.
+  spawn_maxread: '{{ spawn_maxread | default(4092) }}'
+{% endblock constants -%}
+
+{% block commands %}
+{% if connection_command or user_commands or connection_list %}
+commands:
+{% if connection_command %}
+    connect: {{ connection_command }}
+{% elif connection_list %}
+    connections:
+{% for hardware in connection_list %}
+        {{ hardware }}:
+            connect: {{ connection_commands.get(hardware) }}
+{% if hardware in connection_tags %}
+            tags:
+{% if connection_tags.get(hardware) is not string %}
+{% for tag in connection_tags.get(hardware) %}
+            - {{ tag }}
+{% endfor -%}  {# tag #}
+{% endif -%}  {# is list #}
+{% endif -%}  {# if hardware #}
+{% endfor %}
+{% endif -%}
+{% if hard_reset_command %}
+    hard_reset: {{ hard_reset_command }}
+{% endif -%}
+{% if soft_reset_command %}
+    soft_reset: {{ soft_reset_command }}
+{% endif -%}
+{% if soft_reboot_command %}
+    soft_reboot: {{ soft_reboot_command }}
+{% endif -%}
+{% if power_off_command %}
+    power_off: {{ power_off_command }}
+{% endif %}
+{% if power_on_command %}
+    power_on: {{ power_on_command }}
+{% endif %}
+{% if pre_power_command %}
+    pre_power_command: {{ pre_power_command }}
+{% endif -%}
+{% if pre_os_command %}
+    pre_os_command: {{ pre_os_command }}
+{% endif -%}
+{% if user_commands %}
+    users:
+{% for name, command in user_commands.items() %}
+      {{ name }}:
+        do: {{ command['do'] }}
+{% if 'undo' in command %}
+        undo: {{ command['undo'] }}
+{% endif %}
+{% endfor %}
+
+{% endif %}
+{% endif %}
+{% endblock commands -%}
+
+{% if device_info %}
+{# LXC support for dynamic devices over usb etc. #}
+{# admins need to ensure that the device dictionary sets this as a list of dictionaries, where each dictionary value can contain keys such as 'board_id', 'usb_vendor_id', 'usb_product_id'  #}
+device_info: {{ device_info }}
+{% endif -%}
+
+{% if static_info %}
+{# LXC support for adding static devices like energy probes. #}
+{# Also used for some phones which need to stay in the bootloader to charge. #}
+{# admins need to ensure that the device dictionary sets this as a list of dictionaries, where each dictionary value can contain keys such as 'board_id', 'usb_vendor_id', 'usb_product_id'  #}
+static_info: {{ static_info }}
+{% endif -%}
+
+{% if storage_info %}
+{# Test shell support for exposing temporary storage. #}
+{# admins need to ensure that the device dictionary sets this as a list of dictionaries,
+where each dictionary value can contain method names such as 'SATA' with the corresponding
+value of the block device ID such as '/dev/disk/by-id/ata-ST500DM002-1BD142_W3T79GCW' #}
+storage_info: {{ storage_info }}
+{% endif -%}
+
+{% block fastboot %}
+{% if fastboot_serial_number %}
+flash_cmds_order: {{ flash_cmds_order|default(['update', 'ptable',
+                     'partition', 'hyp', 'modem', 'rpm', 'sbl1', 'sbl2',
+                     'sec', 'tz', 'aboot', 'boot', 'rootfs', 'vendor',
+                     'system', 'cache', 'userdata']) }}
+{% endif -%}
+{% endblock fastboot -%}
+
+{% block vland %}
+parameters:
+{% if interfaces or device_ip or device_mac %}
+  interfaces:
+{% if device_ip or device_mac %}
+    target:
+      ip: {{ device_ip|default('') }}
+      mac: '{{ device_mac|default('') }}'
+{% endif %}  # device_ip or device_mac
+{% for interface in interfaces %}
+    {{ interface }}:
+      sysfs: "{{ sysfs.get(interface) }}"
+      mac: "{{ mac_addr.get(interface) }}"
+{% for switch, port in map.get(interface).items() %}
+      switch: "{{ switch }}"
+      port: {{ port }}
+{% endfor %}  # switch, port
+      tags:
+{% if tags.get(interface) %}
+{% for tag in tags.get(interface) %}
+      - {{ tag }}
+{% endfor %}
+{% endif %}  # tags
+{% endfor %}  # interfaces
+{% endif %}  # interfaces or device_ip or device_mac
+
+{% if sata_uuid or sd_uuid or usb_uuid %}
+  media:
+{% if sata_uuid %}
+    sata:
+      UUID-required: {{ uuid_required|default(True) }}
+      {{ sata_label|default('ST160LM003') }}:
+        uuid: {{ sata_uuid }}
+        device_id: {{ sata_id|default(0) }}
+{# FIXME: merge into just sata_interface with changes in lava-dispatcher #}
+        uboot_interface: {{ sata_interface|default('scsi') }}
+        grub_interface: {{ sata_interface|default('hd0') }}
+        boot_part: {{ boot_part|default(1) }}
+{% endif %} #  sata_uuid
+{% if sd_uuid %}
+    sd:
+      {{ sd_label }}:
+        uuid: {{ sd_uuid }}
+        device_id: {{ sd_device_id }}  # the bootloader device id for this media on the 'sd' interface
+{% endif %} #  sd_uuid
+{% if usb_uuid %}
+    usb:
+      {{ usb_label|default('SanDisk_Ultra') }}:
+        uuid: {{ usb_uuid }}  # /dev/disk/by-id/
+        device_id: {{ usb_device_id }}  # the bootloader device id for this media on the 'usb' interface
+{% endif %} # usb_uuid
+{% else %}
+  pass:
+{%- endif %} # sata_uuid_sd_uuid_usb_uuid
+{% endblock vland -%}
+
+{% block body %}{% endblock body -%}
+
+{% block timeouts %}
+timeouts:
+  actions:
+    apply-overlay-image:
+      minutes: {{ action_timeout_apply_overlay_image | default(2) }}
+    dd-image:
+      minutes: {{ action_timeout_dd_image | default(10) }}
+    download-retry:
+      minutes: {{ action_timeout_download_retry | default(5) }}
+    http-download:
+      minutes: {{ action_timeout_http_download | default(5) }}
+    lava-test-shell:
+      minutes: {{ action_timeout_lava_test_shell | default(3) }}
+    nfs-deploy:
+      minutes: {{ action_timeout_nfs_deploy | default(10) }}
+    power-off:
+      seconds: {{ action_timeout_power_off | default(10) }}
+    bootloader-commands:
+      minutes: {{ action_timeout_bootloader_commands | default(3) }}
+    bootloader-interrupt:
+      seconds: {{ action_timeout_bootloader_interrupt | default(30) }}
+    u-boot-interrupt:
+      seconds: {{ action_timeout_u_boot_interrupt | default(30) }}
+    umount-retry:
+      seconds: {{ action_timeout_umount_retry | default(45) }}
+    auto-login-action:
+      minutes: {{ action_timeout_auto_login | default(2) }}
+    bootloader-action:
+      minutes: {{ action_timeout_bootloader_action | default(3)}}
+    uboot-action:
+      minutes: {{ action_timeout_uboot_action | default(3)}}
+    uboot-retry:
+      minutes: {{ action_timeout_uboot_retry | default(3)}}
+    bootloader-retry:
+      minutes: {{ action_timeout_bootloader_retry | default(3)}}
+    boot-qemu-image:
+      minutes: {{ action_timeout_boot_qemu_image | default(2) }}
+    boot-image-retry:
+      minutes: {{ action_timeout_boot_image_retry | default(2) }}
+    flash-uboot-ums:
+      minutes: {{ action_timeout_flash_uboot_ums | default(20) }}
+  connections:
+    dd-image:
+      minutes: {{ connection_timeout_dd_image | default(10) }}
+    uboot-retry:
+      seconds: {{ connection_timeout_uboot_retry | default(30) }}
+    bootloader-commands:
+      seconds: {{ connection_timeout_bootloader_commands | default(30) }}
+    auto-login-action:
+      minutes: {{ connection_timeout_auto_login | default(2) }}
+    bootloader-interrupt:
+      seconds: {{ connection_timeout_bootloader_interrupt | default(30) }}
+    u-boot-interrupt:
+      seconds: {{ connection_timeout_u_boot_interrupt | default(30) }}
+    lava-test-shell:
+      seconds: {{ connection_timeout_feedback | default(10) }}
+{% endblock timeouts -%}

@@ -26,7 +26,8 @@ services:
       - ./server-overlay/etc/lava-server/dispatcher-config/health-checks:/etc/lava-server/dispatcher-config/health-checks
       - ./server-overlay/etc/lava-server/dispatcher-config/devices:/etc/lava-server/dispatcher-config/devices
       - ./server-overlay/root/provision.sh:/root/provision.sh
-      - ./server-overlay/etc/lava-server/dispatcher-config/device-types/beaglebone-black.jinja2:/etc/lava-server/dispatcher-config/device-types/beaglebone-black.jinja2
+      - ./server-overlay/etc/lava-server/dispatcher-config/device-types/base.jinja2:/etc/lava-server/dispatcher-config/device-types/base.jinja2
+      - ./server-overlay/etc/lava-server/dispatcher.d/:/etc/lava-server/dispatcher.d/
     depends_on:
       - database
       - images
@@ -37,14 +38,13 @@ services:
       context: ./dispatcher-docker
 
     container_name: lava_dispatcher
-    #privileged: true
     devices:
       - /dev/kvm
       - /dev/net/tun
       - /dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0001-if00-port0
     cap_add:
       - NET_ADMIN
-      - SYS_ADMIN
+#      - SYS_ADMIN
     environment:
       - "DISPATCHER_HOSTNAME=--hostname=dispatcher"
       - "LOGGER_URL=tcp://server:5555" # url to send logs
@@ -54,7 +54,10 @@ services:
       - ./dispatcher-overlay/etc/ser2net.conf:/etc/ser2net.conf
       - /boot:/boot:ro
       - /lib/modules:/lib/modules:ro
-      - dispatcher-nfs-exports:/var/lib/lava/dispatcher/tmp
+#      - dispatcher-nfs-exports:/var/lib/lava/dispatcher/tmp
+      - /var/lib/lava/dispatcher/tmp:/var/lib/lava/dispatcher/tmp # NFS
+      - /srv/tftp:/srv/tftp # tftp
+      - ./dispatcher-overlay/etc/lava-dispatcher:/etc/lava-dispatcher
 
   # Local health check image hosting
   images:
@@ -66,5 +69,5 @@ services:
 volumes:
   pgdata:
     name: lava-server-pgdata
-  dispatcher-nfs-exports:
-    name: dispatcher-nfs-exports
+#  dispatcher-nfs-exports:
+#    name: dispatcher-nfs-exports
