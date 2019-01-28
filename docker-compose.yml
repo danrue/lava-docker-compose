@@ -30,12 +30,19 @@ services:
     ports:
       - 80:80
     volumes:
+      # Job artifact storage
+      - joboutput:/var/lib/lava-server/default/media/job-output
+
+      # server configuration files and directories
       - ./server-overlay/etc/lava-server/settings.conf:/etc/lava-server/settings.conf
       - ./server-overlay/etc/lava-server/instance.conf:/etc/lava-server/instance.conf
       - ./server-overlay/etc/lava-server/dispatcher-config/health-checks:/etc/lava-server/dispatcher-config/health-checks
       - ./server-overlay/etc/lava-server/dispatcher-config/devices:/etc/lava-server/dispatcher-config/devices
       - ./server-overlay/etc/lava-server/env.yaml:/etc/lava-server/env.yaml
+
+      # provisioning script to add users and boards
       - ./server-overlay/root/provision.sh:/root/provision.sh
+
     depends_on:
       - database
 
@@ -43,10 +50,10 @@ services:
     image: lavasoftware/amd64-lava-dispatcher:2019.01
     container_name: lava_dispatcher
     devices:
-      - /dev/kvm
-      - /dev/net/tun
+      - /dev/kvm # needed for QEMU
+      - /dev/net/tun # needed for QEMU
     cap_add:
-      - NET_ADMIN
+      - NET_ADMIN # needed for QEMU
     environment:
       - "DISPATCHER_HOSTNAME=--hostname=dispatcher"
       - "LOGGER_URL=tcp://server:5555" # url to send logs
@@ -56,7 +63,14 @@ services:
       - '/lib/modules:/lib/modules:ro'
 
 volumes:
+  # postgres data volume
   pgdata:
     name: lava-server-pgdata
+
+  # squid cache volume
   squid:
     name: lava-squid-cache
+
+  # lava-server job artifact volume
+  joboutput:
+    name: lava-server-job-output
