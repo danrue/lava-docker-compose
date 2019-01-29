@@ -65,7 +65,7 @@ services:
     devices:
       - /dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0001-if00-port0
       - /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FT9ROPBL-if00-port0
-
+      - /dev/serial/by-id/usb-FTDI_USB_Serial_Converter_FTB6SPL3-if00-port0
 
 volumes:
   pgdata:

@@ -56,4 +56,14 @@ Dealing with NFS/tftp
 
     edit /usr/lib/python3/dist-packages/lava_dispatcher/actions/boot/__init__.py and set self.interrupt_newline = False
 
+## Board Status
 
+### beaglebone-black
+Working with uboot from 2017.
+
+### x15
+Serial, boot interrupt working, initial boot over nfs working, boot hangs while
+loading kernel.
+
+### rock960
+serial working...
