@@ -8,6 +8,18 @@ services:
       POSTGRES_PASSWORD: mysecretpassword
     volumes:
       - pgdata:/var/lib/postgresql/data
+    restart: always
+
+  squid:
+    image: datadog/squid
+    container_name: lava_squid
+    volumes:
+      - squid:/var/spool/squid
+      - ./squid/squid.conf:/etc/squid/squid.conf
+    ports:
+      - 3128:3128
+    restart: always
+
   server:
     #image: lavasoftware/amd64-lava-server:2019.01
 
@@ -20,6 +32,7 @@ services:
     ports:
       - 80:80
     volumes:
+      - joboutput:/var/lib/lava-server/default/media/job-output
       - ./server-overlay/etc/lava-server/settings.conf:/etc/lava-server/settings.conf
       - ./server-overlay/etc/lava-server/instance.conf:/etc/lava-server/instance.conf
       - ./server-overlay/etc/lava-server/dispatcher-config/health-checks:/etc/lava-server/dispatcher-config/health-checks
@@ -30,6 +43,8 @@ services:
     depends_on:
       - database
       - images
+    restart: always
+
   dispatcher:
     image: lavasoftware/amd64-lava-dispatcher:2019.01
     container_name: lava_dispatcher
@@ -47,8 +62,9 @@ services:
       - /boot:/boot:ro
       - /lib/modules:/lib/modules:ro
       - /var/lib/lava/dispatcher/tmp:/var/lib/lava/dispatcher/tmp # NFS
-      - /srv/tftp:/srv/tftp # tftp
+      - tftp:/srv/tftp
       - ./dispatcher-overlay/etc/lava-dispatcher:/etc/lava-dispatcher
+    restart: always
 
   # Local health check image hosting
   images:
@@ -56,6 +72,7 @@ services:
     container_name: lava_images
     volumes:
       - ./images:/usr/share/nginx/html:ro
+    restart: always
 
   ser2net:
     image: danrue/ser2net:3.5
@@ -63,10 +80,28 @@ services:
     volumes:
       - ./ser2net/ser2net.conf:/etc/ser2net.conf
     devices:
-      - /dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0001-if00-port0
-      - /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FT9ROPBL-if00-port0
-      - /dev/serial/by-id/usb-FTDI_USB_Serial_Converter_FTB6SPL3-if00-port0
+      - /dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0001-if00-port0 # beaglebone-black
+      - /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FT9ROPBL-if00-port0 # x15
+      #- /dev/serial/by-id/usb-FTDI_USB_Serial_Converter_FTB6SPL3-if00-port0 # rock960
+    restart: always
+
+
+  tftpd-hpa:
+    image: danrue/tftpd-hpa:5.2
+    container_name: lava_tftp
+    ports:
+      - 69:69/udp
+    volumes:
+      - tftp:/srv/tftp
+    restart: always
+
 
 volumes:
   pgdata:
     name: lava-server-pgdata
+  squid:
+    name: lava-squid-cache
+  joboutput:
+    name: lava-server-job-output
+  tftp:
+    name: lava-tftp
