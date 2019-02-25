@@ -1,0 +1,83 @@
+
+
+
+metadata:
+  image.type: 'kernel-ci'
+  image.url: http://storage.kernelci.org/mainline/master/v5.0-rc7-118-g8a61716ff2ab/arm/multi_v7_defconfig/gcc-7/
+  kernel.tree: mainline
+  kernel.version: v5.0-rc7-118-g8a61716ff2ab
+  kernel.endian: little
+  kernel.defconfig: multi_v7_defconfig
+  kernel.defconfig_base: multi_v7_defconfig
+  kernel.arch_defconfig: arm-multi_v7_defconfig
+  platform.dtb: am57xx-beagle-x15.dtb
+  platform.dtb_short: am57xx-beagle-x15.dtb
+  platform.fastboot: false
+  platform.name: am57xx-beagle-x15
+  platform.mach: omap2
+  test.plan: boot
+  git.commit: 8a61716ff2ab23eddd1f7a05a075a374e4d0c3d4
+  git.describe: v5.0-rc7-118-g8a61716ff2ab
+  git.branch: master
+  git.url: git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+  device.type: x15
+  job.arch: arm
+  job.name: mainline-master-v5.0-rc7-118-g8a61716ff2ab-arm-multi_v7_defconfig-gcc-7-am57xx-beagle-x15.dtb-beaglebone-black-boot
+  job.kernel_url: http://storage.kernelci.org/mainline/master/v5.0-rc7-118-g8a61716ff2ab/arm/multi_v7_defconfig/gcc-7/zImage
+  job.kernel_image: zImage
+  job.modules_url: http://storage.kernelci.org/mainline/master/v5.0-rc7-118-g8a61716ff2ab/arm/multi_v7_defconfig/gcc-7/modules.tar.xz
+  job.initrd_url: https://storage.kernelci.org/images/rootfs/buildroot/kci-2018.05/armel/base/rootfs.cpio.gz
+  job.nfsrootfs_url: None
+  job.dtb_url: http://storage.kernelci.org/mainline/master/v5.0-rc7-118-g8a61716ff2ab/arm/multi_v7_defconfig/gcc-7/dtbs/am57xx-beagle-x15.dtb
+  job.file_server_resource: mainline/master/v5.0-rc7-118-g8a61716ff2ab/arm/multi_v7_defconfig/gcc-7
+  job.build_environment: gcc-7
+
+
+
+
+
+device_type: x15
+
+
+job_name: mainline-master-v5.0-rc7-118-g8a61716ff2ab-arm-multi_v7_defconfig-gcc-7-am57xx-x15.dtb-beaglebone-x15-boot
+timeouts:
+  job:
+    minutes: 10
+  action:
+   minutes: 10
+  actions:
+    power-off:
+      seconds: 30
+priority: medium
+visibility: public
+
+
+
+
+
+actions:
+- deploy:
+    timeout:
+      minutes: 2
+    to: tftp
+    kernel:
+      url: http://storage.kernelci.org/mainline/master/v5.0-rc7-118-g8a61716ff2ab/arm/multi_v7_defconfig/gcc-7/zImage
+      type: zimage
+    ramdisk:
+      url: https://storage.kernelci.org/images/rootfs/buildroot/kci-2018.05/armel/base/rootfs.cpio.gz
+      compression: gz
+    modules:
+      url: http://storage.kernelci.org/mainline/master/v5.0-rc7-118-g8a61716ff2ab/arm/multi_v7_defconfig/gcc-7/modules.tar.xz
+      compression: xz
+    dtb:
+      url: http://storage.kernelci.org/mainline/master/v5.0-rc7-118-g8a61716ff2ab/arm/multi_v7_defconfig/gcc-7/dtbs/am57xx-beagle-x15.dtb
+    os: oe
+
+
+- boot:
+    timeout:
+      minutes: 5
+    method: u-boot
+    commands: ramdisk
+    prompts:
+      - '/ #'

@@ -4,8 +4,8 @@
 
 set -ex
 
-lava-server manage users list | grep -q admin || \
-    lava-server manage users add --staff --superuser --email admin@example.com --passwd admin admin
+lava-server manage users list | grep -q drue || \
+    lava-server manage users add --staff --superuser --email drue@therub.org --passwd admin drue
 
 lava-server manage device-types list | grep -q qemu || \
     lava-server manage device-types add qemu
