@@ -42,7 +42,6 @@ services:
       - ./server-overlay/etc/lava-server/dispatcher.d/:/etc/lava-server/dispatcher.d/
     depends_on:
       - database
-      - images
     restart: always
 
   dispatcher:
@@ -61,17 +60,9 @@ services:
       - ./dispatcher-overlay/opt:/opt
       - /boot:/boot:ro
       - /lib/modules:/lib/modules:ro
-      - /var/lib/lava/dispatcher/tmp:/var/lib/lava/dispatcher/tmp # NFS
+      - nfsd:/var/lib/lava/dispatcher/tmp
       - tftp:/srv/tftp
       - ./dispatcher-overlay/etc/lava-dispatcher:/etc/lava-dispatcher
-    restart: always
-
-  # Local health check image hosting
-  images:
-    image: nginx
-    container_name: lava_images
-    volumes:
-      - ./images:/usr/share/nginx/html:ro
     restart: always
 
   ser2net:
@@ -96,6 +87,17 @@ services:
     restart: always
 
 
+  nfsd:
+    image: erichough/nfs-server
+    container_name: lava_nfsd
+    ports:
+      - 2049:2049 #nfsv4
+    volumes:
+      - nfsd:/var/lib/lava/dispatcher/tmp
+      - ./nfsd/exports:/etc/exports
+    cap_add:
+      - SYS_ADMIN
+
 volumes:
   pgdata:
     name: lava-server-pgdata
@@ -105,3 +107,5 @@ volumes:
     name: lava-server-job-output
   tftp:
     name: lava-tftp
+  nfsd:
+    name: lava-nfsd

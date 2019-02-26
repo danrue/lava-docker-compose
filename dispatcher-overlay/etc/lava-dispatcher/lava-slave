@@ -23,4 +23,4 @@
 # MASTER_CERT="--master-cert /etc/lava-dispatcher/certificates.d/<master.key>"
 # SLAVE_CERT="--slave-cert /etc/lava-dispatcher/certificates.d/<slave.key_secret>"
 
-NFS_SERVER_IP="10.100.0.52"
+NFS_SERVER_IP="10.100.0.60"
