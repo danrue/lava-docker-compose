@@ -97,6 +97,7 @@ services:
       - ./nfsd/exports:/etc/exports
     cap_add:
       - SYS_ADMIN
+    restart: always
 
 volumes:
   pgdata:
