@@ -4,4 +4,4 @@ up:
 
 clean:
 	docker-compose rm -vsf
-	docker volume rm lava-server-pgdata
+	docker volume rm lava-server-pgdata lava-server-job-output

@@ -20,11 +20,7 @@ services:
       - 3128:3128
 
   server:
-    #image: lavasoftware/amd64-lava-server:2019.01
-    # Use an updated entrypoint; this is necessary to run provision.sh at boot time
-    # See https://git.lavasoftware.org/lava/pkg/docker/merge_requests/10
-    build:
-      context: ./server-docker
+    image: lavasoftware/lava-server:2019.03
 
     container_name: lava_server
     ports:
@@ -41,13 +37,13 @@ services:
       - ./server-overlay/etc/lava-server/env.yaml:/etc/lava-server/env.yaml
 
       # provisioning script to add users and boards
-      - ./server-overlay/root/provision.sh:/root/provision.sh
+      - ./server-overlay/root/entrypoint.d/provision.sh:/root/entrypoint.d/provision.sh
 
     depends_on:
       - database
 
   dispatcher:
-    image: lavasoftware/amd64-lava-dispatcher:2019.01
+    image: lavasoftware/lava-dispatcher:2019.03
     container_name: lava_dispatcher
     devices:
       - /dev/kvm # needed for QEMU

@@ -1,46 +1,45 @@
-# Standard Jessie amd64 JOB definition for QEMU
 device_type: qemu
 
-job_name: qemu-amd64-standard-jessie
-
+job_name: qemu-armv7-health
 timeouts:
   job:
-    minutes: 20
-  action:
     minutes: 10
+  action:
+   minutes: 10
+  actions:
+    power-off:
+      seconds: 30
 priority: medium
 visibility: public
 
-metadata:
-  source: https://git.linaro.org/lava/lava-lab.git
-  path: shared/health-checks/qemu.yaml
-
 context:
-  arch: amd64
+  arch: arm
+  cpu: cortex-a15
+  guestfs_interface: virtio
 
 actions:
 - deploy:
     timeout:
-      minutes: 10
+      minutes: 3
     to: tmpfs
+    os: oe
     images:
-        rootfs:
-          image_arg: -drive format=raw,file={rootfs}
-          url: http://images.validation.linaro.org/kvm/standard/large-stable-6.img.gz
-          compression: gz
-    os: debian
-    root_partition: 1
+      kernel:
+        image_arg: '-kernel {kernel} -append "console=ttyAMA0,115200 root=/dev/ram0 debug verbose"'
+        url: http://people.linaro.org/~dan.rue/health_checks/qemu/zImage
+        sha256sum: ac04608b6fb548eb6eb97509e376aa4f7c7d74a22a4c14c4f1e6b46b2dcbfbd7
+      ramdisk:
+        image_arg: '-initrd {ramdisk}'
+        url: http://people.linaro.org/~dan.rue/health_checks/qemu/rootfs.cpio.gz
+        sha256sum: 0a63d3a669cff57dca9eb5d45f476485ee46b9443ca2078feb860b7e90aeeb38
 
 - boot:
-    method: qemu
     timeout:
-      minutes: 3
+      minutes: 5
+    method: qemu
     media: tmpfs
     prompts:
-    - "root@debian:"
-    auto_login:
-      login_prompt: "login:"
-      username: root
+      - '/ #'
 
 - test:
     timeout:
@@ -57,11 +56,3 @@ actions:
       from: inline
       name: env-dut-inline
       path: inline/env-dut.yaml
-    - repository: http://git.linaro.org/lava-team/lava-functional-tests.git
-      from: git
-      path: lava-test-shell/smoke-tests-basic.yaml
-      name: smoke-tests
-    - repository: http://git.linaro.org/lava-team/lava-functional-tests.git
-      from: git
-      path: lava-test-shell/single-node/singlenode03.yaml
-      name: singlenode-advanced

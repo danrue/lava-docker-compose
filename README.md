@@ -33,10 +33,10 @@ should see qemu-01's health-check running and it should finish successfully.
 
     sudo tar cvzf lava-server-pgdata-$(date +%Y%m%d).tgz /var/lib/docker/volumes/lava-server-pgdata
 
-3. Change e.g. `lavasoftware/amd64-lava-server:2018.11` to
-`lavasoftware/amd64-lava-server:2019.01` and
-`lavasoftware/amd64-lava-dispatcher:2018.11` to
-`lavasoftware/amd64-lava-dispatcher:2019.01` in docker-compose.yml.
+3. Change e.g. `lavasoftware/lava-server:2019.01` to
+`lavasoftware/lava-server:2019.03` and
+`lavasoftware/lava-dispatcher:2019.01` to
+`lavasoftware/lava-dispatcher:2019.03` in docker-compose.yml.
 4. Change the FROM line if any containers are being rebuilt, such as
 [./server-docker/Dockerfile](./server-docker/Dockerfile)
 5. Start containers.
