@@ -4,6 +4,13 @@ This repository attempts to provide a reference implementation of deploying
 LAVA using its [officially distributed docker
 containers](https://master.lavasoftware.org/static/docs/v2/docker-admin.html#official-lava-software-docker-images).
 
+This [lava-docker-compose](https://github.com/danrue/lava-docker-compose)
+repository is designed to be the simplest possible way to for anyone to run
+LAVA locally, and provides a qemu worker by default.
+
+To see a more elaborate example with actual boards, see
+[lava.therub.org](https://github.com/danrue/lava.therub.org).
+
 ## Requirements
 
 Install the following.
@@ -87,14 +94,9 @@ and prevent duplicate downloads. This is enabled in
 
 This is lava-server (lava master). In order to provision a qemu device
 automatically, a script at
-[./server-overlay/root/provision.sh](./server-overlay/root/provision.sh) is run
-at boot time to add a superuser (admin/admin) and a qemu device and qemu
-worker. The lava-server container's
-[entrypoint.sh](server-docker/entrypoint.sh) needed to be modified to support
-this functionality - a feature that could be added upstream (see discussion at
-[pkg/docker
-MR#10](https://git.lavasoftware.org/lava/pkg/docker/merge_requests/10) for
-details).
+[./server-overlay/root/entrypoint.d/provision.sh](./server-overlay/root/entrypoint.d/provision.sh)
+is run at boot time to add a superuser (admin/admin) and a qemu device and qemu
+worker.
 
 Several other files are mounted into the container.
 [settings.conf](server-overlay/etc/lava-server/settings.conf) is provided, as
@@ -104,6 +106,7 @@ well as device and health-check directories.
 
 The lava dispatcher is run using the official container directly. However, to
 use an actual board container modifications would have to be made in a similar
-way as they were made to lava-server. See the beaglebone-black branch for an
-example implemention of a beaglebone-black.
+way as they were made to lava-server. See
+[lava.therub.org](https://github.com/danrue/lava.therub.org) for an example of
+an actual lab with multiple boards.
 
