@@ -31,7 +31,9 @@ should see qemu-01's health-check running and it should finish successfully.
 1. `docker-compose down`
 2. Back up pgsql from its docker volume
 
+```
     sudo tar cvzf lava-server-pgdata-$(date +%Y%m%d).tgz /var/lib/docker/volumes/lava-server-pgdata
+```
 
 3. Change e.g. `lavasoftware/lava-server:2019.03` to
 `lavasoftware/lava-server:2019.04` and
