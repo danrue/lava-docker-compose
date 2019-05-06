@@ -28,19 +28,26 @@ should see qemu-01's health-check running and it should finish successfully.
 
 ## Upgrades
 
-1. Stop containers.
+1. `docker-compose down`
 2. Back up pgsql from its docker volume
 
     sudo tar cvzf lava-server-pgdata-$(date +%Y%m%d).tgz /var/lib/docker/volumes/lava-server-pgdata
 
-3. Change e.g. `lavasoftware/lava-server:2019.01` to
-`lavasoftware/lava-server:2019.03` and
-`lavasoftware/lava-dispatcher:2019.01` to
-`lavasoftware/lava-dispatcher:2019.03` in docker-compose.yml.
-4. Change the FROM line if any containers are being rebuilt, such as
-[./server-docker/Dockerfile](./server-docker/Dockerfile)
-5. Start containers.
+3. Change e.g. `lavasoftware/lava-server:2019.03` to
+`lavasoftware/lava-server:2019.04` and
+`lavasoftware/lava-dispatcher:2019.03` to
+`lavasoftware/lava-dispatcher:2019.04` in docker-compose.yml.
+4. `docker-compose up`
 
+### 2019.03 to 2019.04
+
+This upgrade changed the uid and gid of the lava user in the container to
+200:200. After upgrading, run the following command to chown
+/var/lib/lava-server accordingly:
+
+```
+$ docker-compose exec server chown -R lavaserver:lavaserver /var/lib/lava-server/
+```
 
 ## Design
 
