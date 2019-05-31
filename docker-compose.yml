@@ -20,7 +20,7 @@ services:
       - 3128:3128
 
   server:
-    image: lavasoftware/lava-server:2019.04
+    image: lavasoftware/lava-server:2019.05
 
     container_name: lava_server
     ports:
@@ -43,7 +43,7 @@ services:
       - database
 
   dispatcher:
-    image: lavasoftware/lava-dispatcher:2019.04
+    image: lavasoftware/lava-dispatcher:2019.05
     container_name: lava_dispatcher
     devices:
       - /dev/kvm # needed for QEMU
