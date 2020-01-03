@@ -48,6 +48,15 @@ should see qemu-01's health-check running and it should finish successfully.
 `lavasoftware/lava-dispatcher:2019.05` in docker-compose.yml.
 4. `docker-compose up`
 
+### 2019.05 to 2019.12
+
+LAVA 2019.07 introduced [a
+change](https://git.lavasoftware.org/lava/pkg/docker/merge_requests/42) that
+requires some overlayed files to be owned by the 'lavaserver' user. An
+entrypoint.d file called `chown-files.sh` has been introduced to chown the
+mounted files. This has the downside of changing the ownership of the files
+checked into git, which is modestly inconvenient.
+
 ### 2019.03 to 2019.04
 
 This upgrade changed the uid and gid of the lava user in the container to
