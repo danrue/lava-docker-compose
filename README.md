@@ -1,3 +1,20 @@
+> :warning: **This repository is deprecated! A much better implementation is officially maintained as a part of LAVA at [git.lavasoftware.org](https://git.lavasoftware.org/lava/pkg/docker-compose).**
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # Using LAVA with Docker Compose
 
 This repository attempts to provide a reference implementation of deploying
